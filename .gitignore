@@ -1,0 +1,245 @@
+# Dependencies
+/node_modules
+/.pnpm-store
+
+# Environment variables
+.env
+.env.local
+
+# Build output
+/dist
+/build
+
+# Logs
+logs
+*.log
+
+# Misc
+.DS_Store
+*.swp
+*.bak
+
+# IDE
+.idea
+.vscode
+
+# Coverage
+/coverage
+
+# Cache
+/.cache
+
+# Parcel
+/.parcel-cache
+
+# Next.js
+.next
+/out
+
+# Vite
+/.vite
+
+# Testing
+/cypress
+
+# Debug
+/debug.log
+
+# Yarn
+/yarn-error.log
+/pnpm-debug.log
+/lerna-debug.log
+
+# OS
+Thumbs.db
+
+# Temp
+/tmp
+
+# Editor
+*.sublime-workspace
+*.sublime-project
+
+# Miscellaneous
+*.orig
+*.patch
+*.diff
+
+# Local History for Visual Studio Code
+.history
+
+# Node.js
+npm-debug.log*
+
+# Yarn
+.yarn-integrity
+.yarn-metadata.json
+.yarncache
+
+# pnpm
+pnpm-lock.yaml
+
+# TypeScript
+*.tsbuildinfo
+
+# Testing
+/coverage
+
+# Storybook
+/storybook-static
+
+# SvelteKit
+/.svelte-kit
+
+# Vite
+vite.config.js
+
+# ESLint
+.eslintcache
+
+# Prettier
+.prettiercache
+
+# Turborepo
+/turbo
+
+# Netlify
+.netlify
+
+# Vercel
+.vercel
+
+# Serverless
+.serverless
+
+# Firebase
+.firebase
+
+# AWS
+.aws
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Git
+.gitattributes
+
+# Misc
+*.md
+LICENSE
+
+# Supabase
+supabase
+
+# Local env files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Next.js
+.next
+
+# Nuxt.js
+.nuxt
+
+# Gatsby
+.cache
+/public
+
+# Svelte
+__sapper__
+
+# Angular
+.angular
+
+# Vue
+/dist
+
+# React
+build
+
+# Astro
+/dist
+
+# Parcel
+.parcel-cache
+
+# Rollup
+rollup.config.js
+
+# Webpack
+webpack.config.js
+
+# Babel
+babel.config.js
+
+# Jest
+jest.config.js
+
+# Mocha
+.mocharc.json
+
+# Cypress
+/cypress
+
+# Playwright
+/playwright
+
+# Storybook
+/storybook-static
+
+# Stylelint
+.stylelintrc
+
+# ESLint
+.eslintrc.json
+.eslintrc.js
+.eslintrc.yml
+
+# Prettier
+.prettierrc
+.prettierrc.json
+.prettierrc.yml
+.prettierrc.js
+.prettierrc.toml
+
+# EditorConfig
+.editorconfig
+
+# Husky
+.husky
+
+# Lint Staged
+.lintstagedrc
+
+# Commitlint
+.commitlintrc
+
+# Renovate
+renovate.json
+
+# Dependabot
+.dependabot
+
+# GitHub Actions
+.github
+
+# GitLab CI
+.gitlab-ci.yml
+
+# CircleCI
+.circleci
+
+# Travis CI
+.travis.yml
+
+# AppVeyor
+.appveyor.yml
+
+# Azure Pipelines
+azure-pipelines.yml
+
+# Bitbucket Pipelines
+bitbucket-pipelines.yml
