@@ -223,8 +223,6 @@ renovate.json
 # Dependabot
 .dependabot
 
-# GitHub Actions
-.github
 
 # GitLab CI
 .gitlab-ci.yml
