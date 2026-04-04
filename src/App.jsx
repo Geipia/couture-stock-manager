@@ -1,24 +1,42 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
+import { AuthProvider } from './context/AuthContext'
+import { ToastProvider } from './context/ToastContext'
+import ProtectedRoute from './components/ProtectedRoute'
+import Navbar from './components/Navbar'
 import Home from './pages/Home'
 import Stock from './pages/Stock'
-import Projects from './pages/Projects'
+import Projets from './pages/Projects'
 import Stats from './pages/Stats'
 import Login from './pages/Login'
-import Navbar from './components/Navbar'
 
-function App() {
+function AppLayout() {
+  const location = useLocation()
+  const isLogin = location.pathname === '/login'
+
   return (
-    <Router>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/stock" element={<Stock />} />
-        <Route path="/projects" element={<Projects />} />
-        <Route path="/stats" element={<Stats />} />
-        <Route path="/login" element={<Login />} />
-      </Routes>
-    </Router>
+    <>
+      {!isLogin && <Navbar />}
+      <main className={isLogin ? '' : 'main-content'}>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+          <Route path="/stock" element={<ProtectedRoute><Stock /></ProtectedRoute>} />
+          <Route path="/projets" element={<ProtectedRoute><Projets /></ProtectedRoute>} />
+          <Route path="/stats" element={<ProtectedRoute><Stats /></ProtectedRoute>} />
+        </Routes>
+      </main>
+    </>
   )
 }
 
-export default App
+export default function App() {
+  return (
+    <Router>
+      <AuthProvider>
+        <ToastProvider>
+          <AppLayout />
+        </ToastProvider>
+      </AuthProvider>
+    </Router>
+  )
+}
