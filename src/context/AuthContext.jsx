@@ -8,16 +8,24 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    supabase?.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
+    // Si supabase n'est pas configuré, on débloque le chargement
+    if (!supabase) {
       setLoading(false)
+      return
+    }
+
+    supabase.auth.getSession()
+      .then(({ data: { session } }) => {
+        setUser(session?.user ?? null)
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
     })
 
-    const { data: { subscription } } = supabase?.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
-    }) ?? { data: { subscription: null } }
-
-    return () => subscription?.unsubscribe()
+    return () => subscription.unsubscribe()
   }, [])
 
   async function signOut() {
