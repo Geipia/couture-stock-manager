@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh run:*)",
+      "Bash(npm install:*)",
+      "Bash(VITE_SUPABASE_URL=http://placeholder VITE_SUPABASE_ANON_KEY=placeholder npm run build)",
+      "WebFetch(domain:geipia.github.io)"
+    ]
+  }
+}
