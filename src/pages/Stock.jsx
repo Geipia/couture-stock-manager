@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
-import { Plus, Search, Edit2, Trash2, PlusCircle, History, Package } from 'lucide-react'
+import { Plus, Search, Edit2, Trash2, PlusCircle, MinusCircle, History, Package } from 'lucide-react'
 import Modal from '../components/Modal'
 import { useToast } from '../context/ToastContext'
 import {
   fetchArticles, createArticle, updateArticle, deleteArticle,
-  fetchStockEntries, addStockEntry, uploadPhoto
+  fetchStockEntries, addStockEntry, retirerStock, uploadPhoto
 } from '../services/articleService'
 import { useAuth } from '../context/AuthContext'
 
@@ -33,6 +33,7 @@ export default function Stock() {
   const [articleModal, setArticleModal] = useState(null) // null | 'create' | article obj
   const [detailModal, setDetailModal] = useState(null)
   const [entreeModal, setEntreeModal] = useState(null)
+  const [sortieModal, setSortieModal] = useState(null)
   const [historyModal, setHistoryModal] = useState(null)
   const [deleteConfirm, setDeleteConfirm] = useState(null)
 
@@ -40,6 +41,7 @@ export default function Stock() {
   const [form, setForm] = useState(EMPTY_ARTICLE)
   const [photoFile, setPhotoFile] = useState(null)
   const [entreeForm, setEntreeForm] = useState({ quantite: '', prix_unitaire: '', date_achat: new Date().toISOString().slice(0, 10), fournisseur: '', notes: '' })
+  const [sortieForm, setSortieForm] = useState({ quantite: '', motif: '', date_retrait: new Date().toISOString().slice(0, 10) })
   const [entries, setEntries] = useState([])
   const [saving, setSaving] = useState(false)
 
@@ -66,6 +68,11 @@ export default function Stock() {
   function openEntree(a) {
     setEntreeModal(a)
     setEntreeForm({ quantite: '', prix_unitaire: a.prix_unitaire ?? '', date_achat: new Date().toISOString().slice(0, 10), fournisseur: '', notes: '' })
+  }
+
+  function openSortie(a) {
+    setSortieModal(a)
+    setSortieForm({ quantite: '', motif: '', date_retrait: new Date().toISOString().slice(0, 10) })
   }
 
   async function saveArticle(e) {
@@ -139,6 +146,26 @@ export default function Stock() {
     }
   }
 
+  async function saveSortie(e) {
+    e.preventDefault()
+    setSaving(true)
+    try {
+      await retirerStock({
+        article_id: sortieModal.id,
+        quantite: Number(sortieForm.quantite),
+        motif: sortieForm.motif || null,
+        date_retrait: sortieForm.date_retrait,
+      })
+      await load()
+      setSortieModal(null)
+      showToast('Stock retiré !')
+    } catch (err) {
+      showToast(err.message, 'error')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   if (loading) return <div className="loading-screen"><div className="spinner" /></div>
 
   return (
@@ -186,7 +213,12 @@ export default function Stock() {
             return (
               <div key={a.id} className={`article-card ${isAlert ? 'article-card--alert' : ''}`}>
                 {a.photo_url && (
-                  <img src={a.photo_url} alt={a.nom} className="article-card__photo" />
+                  <img
+                    src={a.photo_url}
+                    alt={a.nom}
+                    className="article-card__photo"
+                    onError={e => { e.target.style.display = 'none' }}
+                  />
                 )}
                 <div className="article-card__header">
                   <span className={`badge ${CAT_CLASS[a.categorie]}`}>
@@ -204,6 +236,9 @@ export default function Stock() {
                 <div className="article-card__actions">
                   <button className="icon-btn" title="Réapprovisionner" onClick={() => openEntree(a)}>
                     <PlusCircle size={16} />
+                  </button>
+                  <button className="icon-btn icon-btn--warning" title="Retirer du stock" onClick={() => openSortie(a)}>
+                    <MinusCircle size={16} />
                   </button>
                   <button className="icon-btn" title="Historique" onClick={() => openHistory(a)}>
                     <History size={16} />
@@ -307,6 +342,32 @@ export default function Stock() {
               <button type="button" className="btn btn--ghost" onClick={() => setEntreeModal(null)}>Annuler</button>
               <button type="submit" className="btn btn--primary" disabled={saving}>
                 {saving ? 'Enregistrement…' : 'Ajouter au stock'}
+              </button>
+            </div>
+          </form>
+        </Modal>
+      )}
+
+      {/* Modal: Sortie stock */}
+      {sortieModal && (
+        <Modal title={`Retirer du stock — ${sortieModal.nom}`} onClose={() => setSortieModal(null)}>
+          <form onSubmit={saveSortie} className="form-grid">
+            <div className="form-group">
+              <label className="form-label">Quantité retirée * (dispo : {sortieModal.quantite} {sortieModal.unite})</label>
+              <input className="form-input" type="number" step="0.01" min="0.01" max={sortieModal.quantite} required value={sortieForm.quantite} onChange={e => setSortieForm(f => ({ ...f, quantite: e.target.value }))} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Date de retrait</label>
+              <input className="form-input" type="date" value={sortieForm.date_retrait} onChange={e => setSortieForm(f => ({ ...f, date_retrait: e.target.value }))} />
+            </div>
+            <div className="form-group form-group--full">
+              <label className="form-label">Motif</label>
+              <input className="form-input" placeholder="ex: perte, don, utilisation…" value={sortieForm.motif} onChange={e => setSortieForm(f => ({ ...f, motif: e.target.value }))} />
+            </div>
+            <div className="form-actions form-group--full">
+              <button type="button" className="btn btn--ghost" onClick={() => setSortieModal(null)}>Annuler</button>
+              <button type="submit" className="btn btn--danger" disabled={saving}>
+                {saving ? 'Enregistrement…' : 'Retirer du stock'}
               </button>
             </div>
           </form>

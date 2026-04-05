@@ -46,11 +46,35 @@ export async function deleteProjet(id) {
   if (error) throw error
 }
 
+// Ajoute un matériau et déduit automatiquement du stock
 export async function addMateriau(materiau) {
   const { data: { user } } = await supabase.auth.getUser()
+
+  // Vérifier et déduire le stock immédiatement
+  if (materiau.article_id) {
+    const { data: article, error: fetchErr } = await supabase
+      .from('articles')
+      .select('quantite, nom')
+      .eq('id', materiau.article_id)
+      .single()
+    if (fetchErr) throw fetchErr
+
+    if (article.quantite < materiau.quantite) {
+      throw new Error(
+        `Stock insuffisant pour "${article.nom}" : ${article.quantite} ${materiau.unite} disponible`
+      )
+    }
+
+    const { error: updateErr } = await supabase
+      .from('articles')
+      .update({ quantite: article.quantite - materiau.quantite })
+      .eq('id', materiau.article_id)
+    if (updateErr) throw updateErr
+  }
+
   const { data, error } = await supabase
     .from('projet_articles')
-    .insert({ ...materiau, user_id: user.id })
+    .insert({ ...materiau, user_id: user.id, deduit: true })
     .select('*, articles(nom, unite, quantite, prix_unitaire)')
     .single()
   if (error) throw error
@@ -68,36 +92,31 @@ export async function updateMateriau(id, updates) {
   return data
 }
 
+// Supprime un matériau et remet la quantité en stock
 export async function deleteMateriau(id) {
-  const { error } = await supabase.from('projet_articles').delete().eq('id', id)
-  if (error) throw error
-}
-
-// Déduire la quantité du stock pour un matériau
-export async function deduireStock(materiau) {
-  const { data: article, error: fetchErr } = await supabase
-    .from('articles')
-    .select('quantite')
-    .eq('id', materiau.article_id)
+  const { data: mat, error: fetchErr } = await supabase
+    .from('projet_articles')
+    .select('article_id, quantite, deduit')
+    .eq('id', id)
     .single()
   if (fetchErr) throw fetchErr
 
-  if (article.quantite < materiau.quantite) {
-    throw new Error(`Stock insuffisant pour "${materiau.nom_article}" (${article.quantite} ${materiau.unite} disponible)`)
+  // Restituer le stock si la déduction a été faite
+  if (mat.deduit && mat.article_id) {
+    const { data: article } = await supabase
+      .from('articles')
+      .select('quantite')
+      .eq('id', mat.article_id)
+      .single()
+
+    if (article) {
+      await supabase
+        .from('articles')
+        .update({ quantite: article.quantite + mat.quantite })
+        .eq('id', mat.article_id)
+    }
   }
 
-  const { error: updateErr } = await supabase
-    .from('articles')
-    .update({ quantite: article.quantite - materiau.quantite })
-    .eq('id', materiau.article_id)
-  if (updateErr) throw updateErr
-
-  const { data, error } = await supabase
-    .from('projet_articles')
-    .update({ deduit: true })
-    .eq('id', materiau.id)
-    .select()
-    .single()
+  const { error } = await supabase.from('projet_articles').delete().eq('id', id)
   if (error) throw error
-  return data
 }

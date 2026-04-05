@@ -49,7 +49,6 @@ export async function fetchStockEntries(articleId) {
 export async function addStockEntry(entry) {
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Fetch current quantity
   const { data: article, error: fetchErr } = await supabase
     .from('articles')
     .select('quantite')
@@ -57,7 +56,6 @@ export async function addStockEntry(entry) {
     .single()
   if (fetchErr) throw fetchErr
 
-  // Insert entry
   const { data, error } = await supabase
     .from('stock_entries')
     .insert({ ...entry, user_id: user.id })
@@ -65,11 +63,47 @@ export async function addStockEntry(entry) {
     .single()
   if (error) throw error
 
-  // Update article quantity
   const { error: updateErr } = await supabase
     .from('articles')
     .update({ quantite: (article.quantite ?? 0) + entry.quantite })
     .eq('id', entry.article_id)
+  if (updateErr) throw updateErr
+
+  return data
+}
+
+// Retirer manuellement du stock (sortie)
+export async function retirerStock({ article_id, quantite, motif, date_retrait }) {
+  const { data: { user } } = await supabase.auth.getUser()
+
+  const { data: article, error: fetchErr } = await supabase
+    .from('articles')
+    .select('quantite, nom')
+    .eq('id', article_id)
+    .single()
+  if (fetchErr) throw fetchErr
+
+  if (article.quantite < quantite) {
+    throw new Error(`Stock insuffisant : ${article.quantite} disponible`)
+  }
+
+  const { data, error } = await supabase
+    .from('stock_entries')
+    .insert({
+      article_id,
+      user_id: user.id,
+      quantite: -quantite,
+      date_achat: date_retrait,
+      notes: motif || 'Sortie manuelle',
+    })
+    .select()
+    .single()
+  if (error) throw error
+
+  const { error: updateErr } = await supabase
+    .from('articles')
+    .update({ quantite: article.quantite - quantite })
+    .eq('id', article_id)
   if (updateErr) throw updateErr
 
   return data

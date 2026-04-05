@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Plus, Trash2, CheckCircle, Circle, FolderOpen, Edit2, ChevronDown, ChevronUp } from 'lucide-react'
+import { Plus, Trash2, CheckCircle, FolderOpen, Edit2, ChevronDown, ChevronUp } from 'lucide-react'
 import Modal from '../components/Modal'
 import { useToast } from '../context/ToastContext'
-import { fetchProjets, fetchProjetDetail, createProjet, updateProjet, deleteProjet, addMateriau, updateMateriau, deleteMateriau, deduireStock } from '../services/projectService'
+import { fetchProjets, fetchProjetDetail, createProjet, updateProjet, deleteProjet, addMateriau, updateMateriau, deleteMateriau } from '../services/projectService'
 import { fetchArticles } from '../services/articleService'
 
 const STATUT_LABEL = { en_cours: 'En cours', termine: 'Terminé', annule: 'Annulé' }
@@ -84,7 +84,6 @@ export default function Projects() {
         nom_article: article?.nom ?? '',
         unite: article?.unite ?? 'pièce',
         quantite: Number(matForm.quantite),
-        deduit: false,
       })
       setDetail(d => d ? { ...d, projet_articles: [...(d.projet_articles ?? []), mat] } : d)
       setMateriauModal(null)
@@ -92,20 +91,6 @@ export default function Projects() {
       showToast('Matériau ajouté !')
     } catch (err) { showToast(err.message, 'error') }
     finally { setSaving(false) }
-  }
-
-  async function handleDeduire(mat) {
-    try {
-      const updated = await deduireStock(mat)
-      setDetail(d => d ? {
-        ...d,
-        projet_articles: d.projet_articles.map(m => m.id === updated.id ? { ...m, ...updated } : m)
-      } : d)
-      showToast(`"${mat.nom_article}" déduit du stock.`)
-      // Refresh articles list
-      const refreshed = await fetchArticles()
-      setArticles(refreshed)
-    } catch (e) { showToast(e.message, 'error') }
   }
 
   async function handleDeleteMat(mat) {
@@ -184,7 +169,7 @@ export default function Projects() {
                     ) : (
                       <table className="table">
                         <thead>
-                          <tr><th>Article</th><th>Quantité</th><th>Déduit</th><th>Actions</th></tr>
+                          <tr><th>Article</th><th>Quantité</th><th>Déduit</th><th></th></tr>
                         </thead>
                         <tbody>
                           {mats.map(m => (
@@ -199,23 +184,12 @@ export default function Projects() {
                               </td>
                               <td>{m.quantite} {m.unite}</td>
                               <td>
-                                {m.deduit
-                                  ? <CheckCircle size={18} className="icon--vert" />
-                                  : <Circle size={18} className="icon--muted" />}
+                                <CheckCircle size={18} className="icon--vert" />
                               </td>
                               <td>
-                                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                  {!m.deduit && m.article_id && (
-                                    <button className="btn btn--sm btn--primary" onClick={() => handleDeduire(m)}>
-                                      Déduire du stock
-                                    </button>
-                                  )}
-                                  {!m.deduit && (
-                                    <button className="icon-btn icon-btn--danger" onClick={() => handleDeleteMat(m)}>
-                                      <Trash2 size={14} />
-                                    </button>
-                                  )}
-                                </div>
+                                <button className="icon-btn icon-btn--danger" onClick={() => handleDeleteMat(m)}>
+                                  <Trash2 size={14} />
+                                </button>
                               </td>
                             </tr>
                           ))}
