@@ -31,8 +31,13 @@ jobs:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
-      - name: Deploy to gh-pages branch
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: dist
-          branch: gh-pages
+      - name: Commit built files to main for GitHub Pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git rm -rf assets/ 2>/dev/null || true
+          cp dist/index.html index.html
+          cp -r dist/assets ./assets
+          git add -f index.html assets/
+          git diff --staged --quiet || git commit -m "chore: update built files [skip ci]"
+          git push
