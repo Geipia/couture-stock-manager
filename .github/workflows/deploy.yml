@@ -12,6 +12,8 @@ env:
 
 jobs:
   deploy:
+    # Skip when github-actions bot pushes built files (prevent infinite loop)
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -39,5 +41,5 @@ jobs:
           cp dist/index.html index.html
           cp -r dist/assets ./assets
           git add -f index.html assets/
-          git diff --staged --quiet || git commit -m "chore: update built files [skip ci]"
+          git diff --staged --quiet || git commit -m "chore: update built files"
           git push
