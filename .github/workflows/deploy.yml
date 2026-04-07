@@ -12,7 +12,7 @@ env:
 
 jobs:
   deploy:
-    # Skip when github-actions bot pushes built files (prevent infinite loop)
+    # Skip when the bot pushes built files (prevents infinite loop)
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
@@ -23,6 +23,26 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
+
+      - name: Restore source index.html before building
+        run: |
+          cat > index.html << 'HTMLEOF'
+          <!DOCTYPE html>
+          <html lang="fr">
+            <head>
+              <meta charset="UTF-8" />
+              <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+              <title>Couture Stock</title>
+              <link rel="preconnect" href="https://fonts.googleapis.com">
+              <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+              <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+            </head>
+            <body>
+              <div id="root"></div>
+              <script type="module" src="/src/main.jsx"></script>
+            </body>
+          </html>
+          HTMLEOF
 
       - name: Install dependencies
         run: npm install
