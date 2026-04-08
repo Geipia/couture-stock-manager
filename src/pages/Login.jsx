@@ -1,11 +1,13 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Scissors, Mail, Lock, Eye, EyeOff, UserPlus } from 'lucide-react'
 import { supabase } from '../services/supabaseClient'
+import { useAuth } from '../context/AuthContext'
 
 export default function Login() {
   const navigate = useNavigate()
-  const [tab, setTab] = useState('login') // 'login' | 'signup' | 'forgot'
+  const { isRecovery, clearRecovery } = useAuth()
+  const [tab, setTab] = useState('login') // 'login' | 'signup' | 'forgot' | 'reset'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [passwordConfirm, setPasswordConfirm] = useState('')
@@ -13,6 +15,15 @@ export default function Login() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+
+  // Quand l'utilisateur arrive via un lien de reset, on affiche le formulaire de nouveau mot de passe
+  useEffect(() => {
+    if (isRecovery) {
+      setTab('reset')
+      setError('')
+      setSuccess('')
+    }
+  }, [isRecovery])
 
   function switchTab(t) {
     setTab(t)
@@ -60,7 +71,32 @@ export default function Login() {
     })
     setLoading(false)
     if (error) setError(error.message)
-    else setSuccess('Un email de réinitialisation a été envoyé.')
+    else setSuccess('Un email de réinitialisation a été envoyé. Vérifie ta boîte mail.')
+  }
+
+  async function handleResetPassword(e) {
+    e.preventDefault()
+    setError('')
+    if (password !== passwordConfirm) {
+      setError('Les mots de passe ne correspondent pas.')
+      return
+    }
+    if (password.length < 6) {
+      setError('Le mot de passe doit contenir au moins 6 caractères.')
+      return
+    }
+    setLoading(true)
+    const { error } = await supabase.auth.updateUser({ password })
+    setLoading(false)
+    if (error) {
+      setError(error.message)
+    } else {
+      clearRecovery()
+      setSuccess('Mot de passe mis à jour ! Tu peux te connecter.')
+      setTab('login')
+      setPassword('')
+      setPasswordConfirm('')
+    }
   }
 
   return (
@@ -72,26 +108,28 @@ export default function Login() {
           <p>Gérez votre stock de couture</p>
         </div>
 
-        <div className="login-tabs">
-          <button
-            className={tab === 'login' ? 'login-tab login-tab--active' : 'login-tab'}
-            onClick={() => switchTab('login')}
-          >
-            Connexion
-          </button>
-          <button
-            className={tab === 'signup' ? 'login-tab login-tab--active' : 'login-tab'}
-            onClick={() => switchTab('signup')}
-          >
-            Créer un compte
-          </button>
-          <button
-            className={tab === 'forgot' ? 'login-tab login-tab--active' : 'login-tab'}
-            onClick={() => switchTab('forgot')}
-          >
-            Mot de passe oublié
-          </button>
-        </div>
+        {tab !== 'reset' && (
+          <div className="login-tabs">
+            <button
+              className={tab === 'login' ? 'login-tab login-tab--active' : 'login-tab'}
+              onClick={() => switchTab('login')}
+            >
+              Connexion
+            </button>
+            <button
+              className={tab === 'signup' ? 'login-tab login-tab--active' : 'login-tab'}
+              onClick={() => switchTab('signup')}
+            >
+              Créer un compte
+            </button>
+            <button
+              className={tab === 'forgot' ? 'login-tab login-tab--active' : 'login-tab'}
+              onClick={() => switchTab('forgot')}
+            >
+              Mot de passe oublié
+            </button>
+          </div>
+        )}
 
         {error && <div className="alert alert--danger">{error}</div>}
         {success && <div className="alert alert--success">{success}</div>}
@@ -218,6 +256,53 @@ export default function Login() {
             </div>
             <button type="submit" className="btn btn--primary btn--full" disabled={loading}>
               {loading ? 'Envoi…' : 'Envoyer le lien de réinitialisation'}
+            </button>
+            <p className="login-hint">
+              <button type="button" className="link-btn" onClick={() => switchTab('login')}>
+                Retour à la connexion
+              </button>
+            </p>
+          </form>
+        )}
+
+        {tab === 'reset' && (
+          <form onSubmit={handleResetPassword} className="login-form">
+            <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
+              Choisis un nouveau mot de passe
+            </p>
+            <div className="form-group">
+              <label className="form-label">Nouveau mot de passe</label>
+              <div className="input-icon">
+                <Lock size={16} />
+                <input
+                  type={showPwd ? 'text' : 'password'}
+                  className="form-input"
+                  placeholder="6 caractères minimum"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  required
+                />
+                <button type="button" className="input-toggle" onClick={() => setShowPwd(s => !s)}>
+                  {showPwd ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Confirmer le mot de passe</label>
+              <div className="input-icon">
+                <Lock size={16} />
+                <input
+                  type={showPwd ? 'text' : 'password'}
+                  className="form-input"
+                  placeholder="••••••••"
+                  value={passwordConfirm}
+                  onChange={e => setPasswordConfirm(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+            <button type="submit" className="btn btn--primary btn--full" disabled={loading}>
+              {loading ? 'Enregistrement…' : 'Mettre à jour le mot de passe'}
             </button>
           </form>
         )}

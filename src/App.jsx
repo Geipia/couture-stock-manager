@@ -1,6 +1,7 @@
-import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
+import { HashRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { ToastProvider } from './context/ToastContext'
+import { useAuth } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import ErrorBoundary from './components/ErrorBoundary'
 import Navbar from './components/Navbar'
@@ -12,7 +13,13 @@ import Login from './pages/Login'
 
 function AppLayout() {
   const location = useLocation()
+  const { isRecovery } = useAuth()
   const isLogin = location.pathname === '/login'
+
+  // Si l'utilisateur arrive via un lien de reset de mot de passe, on le redirige vers /login
+  if (isRecovery && !isLogin) {
+    return <Navigate to="/login" replace />
+  }
 
   return (
     <>

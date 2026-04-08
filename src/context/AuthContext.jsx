@@ -6,6 +6,7 @@ const AuthContext = createContext(null)
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [isRecovery, setIsRecovery] = useState(false)
 
   useEffect(() => {
     // Si supabase n'est pas configuré, on débloque le chargement
@@ -21,8 +22,14 @@ export function AuthProvider({ children }) {
       .catch(() => {})
       .finally(() => setLoading(false))
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setIsRecovery(true)
+        setUser(session?.user ?? null)
+      } else {
+        setUser(session?.user ?? null)
+        if (event === 'USER_UPDATED') setIsRecovery(false)
+      }
     })
 
     return () => subscription.unsubscribe()
@@ -32,8 +39,12 @@ export function AuthProvider({ children }) {
     await supabase?.auth.signOut()
   }
 
+  function clearRecovery() {
+    setIsRecovery(false)
+  }
+
   return (
-    <AuthContext.Provider value={{ user, loading, signOut }}>
+    <AuthContext.Provider value={{ user, loading, signOut, isRecovery, clearRecovery }}>
       {children}
     </AuthContext.Provider>
   )
