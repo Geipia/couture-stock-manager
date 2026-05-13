@@ -4,7 +4,12 @@
       "Bash(gh run:*)",
       "Bash(npm install:*)",
       "Bash(VITE_SUPABASE_URL=http://placeholder VITE_SUPABASE_ANON_KEY=placeholder npm run build)",
-      "WebFetch(domain:geipia.github.io)"
+      "WebFetch(domain:geipia.github.io)",
+      "Bash(mkdir -p \"C:\\\\Users\\\\pelti\\\\Desktop\\\\code\\\\dev-requests-dashboard\\\\src\\\\components\")",
+      "Bash(mkdir -p \"C:\\\\Users\\\\pelti\\\\Desktop\\\\code\\\\dev-requests-dashboard\\\\src\\\\context\")",
+      "Bash(mkdir -p \"C:\\\\Users\\\\pelti\\\\Desktop\\\\code\\\\dev-requests-dashboard\\\\src\\\\pages\")",
+      "Bash(mkdir -p \"C:\\\\Users\\\\pelti\\\\Desktop\\\\code\\\\dev-requests-dashboard\\\\src\\\\services\")",
+      "Bash(mkdir -p \"C:\\\\Users\\\\pelti\\\\Desktop\\\\code\\\\dev-requests-dashboard\\\\src\\\\styles\")"
     ]
   }
 }
