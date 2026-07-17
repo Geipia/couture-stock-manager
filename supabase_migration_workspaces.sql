@@ -82,12 +82,13 @@ CREATE TRIGGER on_workspace_created
   FOR EACH ROW EXECUTE FUNCTION public.add_owner_as_member();
 
 -- 7. Migrer les données existantes : créer un workspace par défaut pour chaque utilisateur
--- et y rattacher tous ses articles et projets existants
+-- SET LOCAL row_security = OFF permet de contourner le RLS pendant la migration
 DO $$
 DECLARE
   u RECORD;
   ws_id UUID;
 BEGIN
+  SET LOCAL row_security = OFF;
   FOR u IN SELECT DISTINCT user_id FROM articles WHERE workspace_id IS NULL LOOP
     INSERT INTO workspaces (name, owner_id) VALUES ('Mon magasin', u.user_id) RETURNING id INTO ws_id;
     UPDATE articles SET workspace_id = ws_id WHERE user_id = u.user_id AND workspace_id IS NULL;
