@@ -114,6 +114,57 @@ a  { text-decoration: none; color: inherit; }
   @media (max-width: 768px) { display: none; }
 }
 
+.navbar__bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  border-top: 1px solid $border;
+  padding-top: 0.75rem;
+  margin-top: 0.5rem;
+  @media (max-width: 768px) { display: none; }
+}
+
+.navbar__workspace {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  margin-bottom: 0.5rem;
+  background: $rose-light;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  color: $rose-dark;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  &:hover { background: darken($rose-light, 3%); }
+  span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  @media (max-width: 768px) { display: none; }
+}
+
+.nav-link--admin {
+  color: $lavande !important;
+  font-size: 0.8rem;
+  pointer-events: none;
+}
+
+.badge--admin {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.5rem;
+  background: $lavande-light;
+  color: darken($lavande, 30%);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
 .nav-link {
   display: flex;
   align-items: center;
@@ -757,4 +808,349 @@ a  { text-decoration: none; color: inherit; }
 @keyframes slideIn {
   from { transform: translateX(100%); opacity: 0; }
   to   { transform: translateX(0);    opacity: 1; }
+}
+
+// ===== WORKSPACE SELECTOR =====
+.ws-page {
+  min-height: 100vh;
+  background: $bg;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.ws-container {
+  width: 100%;
+  max-width: 860px;
+}
+
+.ws-loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ws-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.ws-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: $rose-dark;
+  h1 { font-size: 1.5rem; color: $rose-dark; }
+}
+
+.ws-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.ws-user-email {
+  font-size: 0.82rem;
+  color: $text-muted;
+}
+
+.ws-invitations {
+  background: $warning-light;
+  border: 1px solid $warning;
+  border-radius: $radius;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    color: darken($warning, 25%);
+  }
+}
+
+.invitation-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  background: $surface;
+  border-radius: $radius-sm;
+  padding: 0.85rem 1rem;
+  margin-bottom: 0.5rem;
+  &:last-child { margin-bottom: 0; }
+}
+
+.invitation-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  div { display: flex; flex-direction: column; }
+  strong { font-size: 0.95rem; }
+  span { font-size: 0.8rem; color: $text-muted; }
+}
+
+.invitation-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.ws-section {
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: $radius;
+  padding: 1.5rem;
+}
+
+.ws-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.05rem;
+  }
+}
+
+.ws-create-form {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+  input { flex: 1; min-width: 200px; }
+}
+
+.ws-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: $text-muted;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  p { font-size: 1rem; }
+}
+
+.ws-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.ws-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: $bg;
+  border: 2px solid $border;
+  border-radius: $radius;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+  width: 100%;
+  &:hover {
+    border-color: $rose-dark;
+    background: $rose-light;
+    transform: translateY(-2px);
+    box-shadow: $shadow-md;
+  }
+}
+
+.ws-card-icon {
+  width: 48px;
+  height: 48px;
+  background: $rose-light;
+  border-radius: $radius-sm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $rose-dark;
+  flex-shrink: 0;
+}
+
+.ws-card-body { flex: 1; min-width: 0; }
+
+.ws-card-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: $text;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ws-card-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+}
+
+.ws-member-count {
+  font-size: 0.72rem;
+  color: $text-muted;
+}
+
+.ws-owner-email {
+  font-size: 0.72rem;
+  color: $text-muted;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// ===== SETTINGS PAGE =====
+.settings-card {
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: $radius;
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+  }
+
+  &--danger {
+    border-color: lighten($danger, 20%);
+    background: $danger-light;
+    h2 { color: $danger; }
+  }
+}
+
+.settings-form-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  input { flex: 1; min-width: 200px; }
+}
+
+.members-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.member-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background: $bg;
+  border-radius: $radius-sm;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.member-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.member-avatar {
+  width: 36px;
+  height: 36px;
+  background: $rose-light;
+  color: $rose-dark;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.member-email { font-size: 0.88rem; font-weight: 500; }
+.member-name  { font-size: 0.78rem; color: $text-muted; }
+
+.member-role-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.input-icon-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+  .input-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $text-muted;
+    pointer-events: none;
+  }
+  input { padding-left: 2.25rem; }
+}
+
+.pending-invite-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background: $bg;
+  border-radius: $radius-sm;
+  margin-bottom: 0.4rem;
+  font-size: 0.85rem;
+  span { display: flex; align-items: center; gap: 0.4rem; color: $text-muted; }
+}
+
+.danger-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: $radius-sm;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: $text-muted;
+  transition: all 0.15s;
+  &:hover { background: $bg; }
+  &--danger:hover { background: $danger-light; color: $danger; }
+}
+
+.btn--success {
+  background: $vert;
+  color: darken($vert, 35%);
+  &:hover { background: darken($vert, 8%); }
+}
+
+.btn--danger {
+  background: $danger-light;
+  color: $danger;
+  border: 1px solid lighten($danger, 10%);
+  &:hover { background: $danger; color: #fff; }
 }

@@ -1,19 +1,18 @@
 import { supabase } from './supabaseClient'
 
-export async function fetchArticles() {
-  const { data, error } = await supabase
-    .from('articles')
-    .select('*')
-    .order('nom')
+export async function fetchArticles(workspaceId) {
+  let query = supabase.from('articles').select('*').order('nom')
+  if (workspaceId) query = query.eq('workspace_id', workspaceId)
+  const { data, error } = await query
   if (error) throw error
   return data ?? []
 }
 
-export async function createArticle(article) {
+export async function createArticle(article, workspaceId) {
   const { data: { user } } = await supabase.auth.getUser()
   const { data, error } = await supabase
     .from('articles')
-    .insert({ ...article, user_id: user.id })
+    .insert({ ...article, user_id: user.id, workspace_id: workspaceId })
     .select()
     .single()
   if (error) throw error
@@ -72,7 +71,6 @@ export async function addStockEntry(entry) {
   return data
 }
 
-// Retirer manuellement du stock (sortie)
 export async function retirerStock({ article_id, quantite, motif, date_retrait }) {
   const { data: { user } } = await supabase.auth.getUser()
 

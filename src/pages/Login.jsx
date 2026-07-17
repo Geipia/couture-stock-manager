@@ -40,7 +40,7 @@ export default function Login() {
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     setLoading(false)
     if (error) setError(error.message)
-    else navigate('/')
+    else navigate('/workspaces')
   }
 
   async function handleSignup(e) {

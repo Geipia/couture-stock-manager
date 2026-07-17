@@ -1,10 +1,12 @@
 import { supabase } from './supabaseClient'
 
-export async function fetchProjets() {
-  const { data, error } = await supabase
+export async function fetchProjets(workspaceId) {
+  let query = supabase
     .from('projets')
     .select('*, projet_articles(id)')
     .order('created_at', { ascending: false })
+  if (workspaceId) query = query.eq('workspace_id', workspaceId)
+  const { data, error } = await query
   if (error) throw error
   return data ?? []
 }
@@ -19,11 +21,11 @@ export async function fetchProjetDetail(id) {
   return data
 }
 
-export async function createProjet(projet) {
+export async function createProjet(projet, workspaceId) {
   const { data: { user } } = await supabase.auth.getUser()
   const { data, error } = await supabase
     .from('projets')
-    .insert({ ...projet, user_id: user.id })
+    .insert({ ...projet, user_id: user.id, workspace_id: workspaceId })
     .select()
     .single()
   if (error) throw error
@@ -46,11 +48,9 @@ export async function deleteProjet(id) {
   if (error) throw error
 }
 
-// Ajoute un matériau et déduit automatiquement du stock
 export async function addMateriau(materiau) {
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Vérifier et déduire le stock immédiatement
   if (materiau.article_id) {
     const { data: article, error: fetchErr } = await supabase
       .from('articles')
@@ -92,7 +92,6 @@ export async function updateMateriau(id, updates) {
   return data
 }
 
-// Supprime un matériau et remet la quantité en stock
 export async function deleteMateriau(id) {
   const { data: mat, error: fetchErr } = await supabase
     .from('projet_articles')
@@ -101,7 +100,6 @@ export async function deleteMateriau(id) {
     .single()
   if (fetchErr) throw fetchErr
 
-  // Restituer le stock si la déduction a été faite
   if (mat.deduit && mat.article_id) {
     const { data: article } = await supabase
       .from('articles')

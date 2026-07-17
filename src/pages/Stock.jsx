@@ -7,6 +7,7 @@ import {
   fetchStockEntries, addStockEntry, retirerStock, uploadPhoto
 } from '../services/articleService'
 import { useAuth } from '../context/AuthContext'
+import { useWorkspace } from '../context/WorkspaceContext'
 
 const CATEGORIES = [
   { value: 'tissu',      label: 'Tissu'       },
@@ -23,6 +24,7 @@ const EMPTY_ARTICLE = {
 
 export default function Stock() {
   const { user } = useAuth()
+  const { workspace } = useWorkspace()
   const { showToast } = useToast()
   const [articles, setArticles] = useState([])
   const [loading, setLoading] = useState(true)
@@ -45,11 +47,11 @@ export default function Stock() {
   const [entries, setEntries] = useState([])
   const [saving, setSaving] = useState(false)
 
-  useEffect(() => { load() }, [])
+  useEffect(() => { load() }, [workspace?.id])
 
   async function load() {
     setLoading(true)
-    try { setArticles(await fetchArticles()) } catch (e) { showToast(e.message, 'error') }
+    try { setArticles(await fetchArticles(workspace?.id)) } catch (e) { showToast(e.message, 'error') }
     finally { setLoading(false) }
   }
 
@@ -91,7 +93,7 @@ export default function Stock() {
 
       let saved
       if (articleModal === 'create') {
-        saved = await createArticle(payload)
+        saved = await createArticle(payload, workspace?.id)
       } else {
         saved = await updateArticle(articleModal.id, payload)
       }

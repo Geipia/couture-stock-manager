@@ -4,12 +4,14 @@ import Modal from '../components/Modal'
 import { useToast } from '../context/ToastContext'
 import { fetchProjets, fetchProjetDetail, createProjet, updateProjet, deleteProjet, addMateriau, updateMateriau, deleteMateriau } from '../services/projectService'
 import { fetchArticles } from '../services/articleService'
+import { useWorkspace } from '../context/WorkspaceContext'
 
 const STATUT_LABEL = { en_cours: 'En cours', termine: 'Terminé', annule: 'Annulé' }
 const STATUT_CLASS = { en_cours: 'badge--bleu', termine: 'badge--vert', annule: 'badge--grey' }
 const CAT_CLASS = { tissu: 'badge--rose', fil: 'badge--bleu', accessoire: 'badge--vert' }
 
 export default function Projects() {
+  const { workspace } = useWorkspace()
   const { showToast } = useToast()
   const [projets, setProjets] = useState([])
   const [articles, setArticles] = useState([])
@@ -23,12 +25,12 @@ export default function Projects() {
   const [matForm, setMatForm] = useState({ article_id: '', quantite: '' })
   const [saving, setSaving] = useState(false)
 
-  useEffect(() => { load() }, [])
+  useEffect(() => { load() }, [workspace?.id])
 
   async function load() {
     setLoading(true)
     try {
-      const [p, a] = await Promise.all([fetchProjets(), fetchArticles()])
+      const [p, a] = await Promise.all([fetchProjets(workspace?.id), fetchArticles(workspace?.id)])
       setProjets(p)
       setArticles(a)
     } catch (e) { showToast(e.message, 'error') }
@@ -50,7 +52,7 @@ export default function Projects() {
     try {
       let saved
       if (projetModal === 'create') {
-        saved = await createProjet(form)
+        saved = await createProjet(form, workspace?.id)
         setProjets(prev => [{ ...saved, projet_articles: [] }, ...prev])
       } else {
         saved = await updateProjet(projetModal.id, form)
