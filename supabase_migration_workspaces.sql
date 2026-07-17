@@ -160,7 +160,11 @@ DROP POLICY IF EXISTS "members_select" ON workspace_members;
 DROP POLICY IF EXISTS "members_insert" ON workspace_members;
 DROP POLICY IF EXISTS "members_delete" ON workspace_members;
 CREATE POLICY "members_select" ON workspace_members FOR SELECT
-  USING (is_admin() OR user_id = auth.uid() OR is_workspace_member(workspace_id));
+  USING (
+    is_admin() OR
+    user_id = auth.uid() OR
+    EXISTS (SELECT 1 FROM workspaces WHERE id = workspace_id AND owner_id = auth.uid())
+  );
 CREATE POLICY "members_insert" ON workspace_members FOR INSERT WITH CHECK (
   is_admin() OR user_id = auth.uid() OR
   EXISTS (SELECT 1 FROM workspaces WHERE id = workspace_id AND owner_id = auth.uid())
@@ -175,7 +179,10 @@ DROP POLICY IF EXISTS "invitations_select" ON workspace_invitations;
 DROP POLICY IF EXISTS "invitations_insert" ON workspace_invitations;
 DROP POLICY IF EXISTS "invitations_update" ON workspace_invitations;
 CREATE POLICY "invitations_select" ON workspace_invitations FOR SELECT
-  USING (is_admin() OR invited_by = auth.uid() OR is_workspace_member(workspace_id) OR
+  USING (
+    is_admin() OR
+    invited_by = auth.uid() OR
+    EXISTS (SELECT 1 FROM workspaces WHERE id = workspace_id AND owner_id = auth.uid()) OR
     invited_email = (SELECT email FROM profiles WHERE id = auth.uid())
   );
 CREATE POLICY "invitations_insert" ON workspace_invitations FOR INSERT

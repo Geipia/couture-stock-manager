@@ -31,6 +31,11 @@ export default function Navbar({ alertCount = 0 }) {
     navigate('/workspaces')
   }
 
+  async function handleSignOut() {
+    await signOut()
+    navigate('/login')
+  }
+
   return (
     <>
       <nav className="navbar">
@@ -88,7 +93,7 @@ export default function Navbar({ alertCount = 0 }) {
             </div>
           )}
 
-          <button className="navbar__logout" onClick={signOut}>
+          <button className="navbar__logout" onClick={handleSignOut}>
             <LogOut size={18} />
             <span>Déconnexion</span>
           </button>
@@ -121,7 +126,7 @@ export default function Navbar({ alertCount = 0 }) {
           <button className="mobile-link" onClick={handleChangeWorkspace}>
             <Store size={20} /><span>Changer d'espace</span>
           </button>
-          <button className="mobile-link" onClick={signOut}>
+          <button className="mobile-link" onClick={handleSignOut}>
             <LogOut size={20} /><span>Déconnexion</span>
           </button>
         </div>
