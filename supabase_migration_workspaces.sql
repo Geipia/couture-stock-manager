@@ -108,6 +108,22 @@ ALTER TABLE workspaces            ENABLE ROW LEVEL SECURITY;
 ALTER TABLE workspace_members     ENABLE ROW LEVEL SECURITY;
 ALTER TABLE workspace_invitations ENABLE ROW LEVEL SECURITY;
 
+-- RPC function : crée un workspace pour l'utilisateur courant (contourne le RLS via SECURITY DEFINER)
+CREATE OR REPLACE FUNCTION public.create_workspace(workspace_name TEXT)
+RETURNS json LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE
+  result workspaces;
+BEGIN
+  IF auth.uid() IS NULL THEN
+    RAISE EXCEPTION 'Not authenticated';
+  END IF;
+  INSERT INTO workspaces (name, owner_id)
+  VALUES (workspace_name, auth.uid())
+  RETURNING * INTO result;
+  RETURN row_to_json(result);
+END;
+$$;
+
 -- Helper function : is user admin?
 CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS BOOLEAN LANGUAGE sql SECURITY DEFINER AS $$

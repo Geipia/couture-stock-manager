@@ -28,12 +28,7 @@ export async function fetchAllWorkspaces() {
 }
 
 export async function createWorkspace(name) {
-  const { data: { user } } = await supabase.auth.getUser()
-  const { data, error } = await supabase
-    .from('workspaces')
-    .insert({ name, owner_id: user.id })
-    .select()
-    .single()
+  const { data, error } = await supabase.rpc('create_workspace', { workspace_name: name })
   if (error) throw error
   return data
 }
