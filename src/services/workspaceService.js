@@ -10,12 +10,21 @@ export async function fetchMyWorkspaces() {
 }
 
 export async function fetchAllWorkspaces() {
-  const { data, error } = await supabase
+  const { data: workspaces, error } = await supabase
     .from('workspaces')
-    .select('*, workspace_members(role, user_id), profiles!workspaces_owner_id_fkey(email, display_name)')
+    .select('*, workspace_members(role, user_id)')
     .order('created_at')
   if (error) throw error
-  return data ?? []
+  if (!workspaces?.length) return []
+
+  const ownerIds = [...new Set(workspaces.map(w => w.owner_id))]
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('id, email, display_name')
+    .in('id', ownerIds)
+
+  const byId = Object.fromEntries((profiles ?? []).map(p => [p.id, p]))
+  return workspaces.map(ws => ({ ...ws, profiles: byId[ws.owner_id] ?? null }))
 }
 
 export async function createWorkspace(name) {
