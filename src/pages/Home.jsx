@@ -16,9 +16,13 @@ export default function Home() {
 
   useEffect(() => {
     if (!workspace) return
+    setLoading(true)
+    const timer = setTimeout(() => setLoading(false), 10000)
     Promise.all([fetchArticles(workspace.id), fetchProjets(workspace.id)])
       .then(([a, p]) => { setArticles(a); setProjets(p) })
-      .finally(() => setLoading(false))
+      .catch(() => {})
+      .finally(() => { clearTimeout(timer); setLoading(false) })
+    return () => clearTimeout(timer)
   }, [workspace?.id])
 
   const alertes = articles.filter(a => a.seuil_alerte > 0 && a.quantite <= a.seuil_alerte)
