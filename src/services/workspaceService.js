@@ -118,7 +118,7 @@ export async function respondToInvitation(invitationId, accept) {
     .from('workspace_invitations')
     .update({ status })
     .eq('id', invitationId)
-    .select('*, workspaces(id, name)')
+    .select('*')
     .single()
   if (error) throw error
 
@@ -126,7 +126,7 @@ export async function respondToInvitation(invitationId, accept) {
     const { data: { user } } = await supabase.auth.getUser()
     const { error: memberError } = await supabase
       .from('workspace_members')
-      .insert({ workspace_id: data.workspaces.id, user_id: user.id, role: 'member' })
+      .insert({ workspace_id: data.workspace_id, user_id: user.id, role: 'member' })
     if (memberError && !memberError.message.includes('duplicate')) throw memberError
   }
 
