@@ -13,7 +13,7 @@ import {
 export default function Settings() {
   const { user, isAdmin } = useAuth()
   const { workspace, selectWorkspace, clearWorkspace } = useWorkspace()
-  const { addToast } = useToast()
+  const { showToast: addToast } = useToast()
   const navigate = useNavigate()
 
   const [members, setMembers] = useState([])

@@ -12,7 +12,7 @@ import {
 export default function WorkspaceSelector() {
   const { user, isAdmin, signOut } = useAuth()
   const { selectWorkspace } = useWorkspace()
-  const { addToast } = useToast()
+  const { showToast: addToast } = useToast()
   const navigate = useNavigate()
 
   const [workspaces, setWorkspaces] = useState([])
