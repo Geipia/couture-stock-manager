@@ -22,13 +22,16 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (!supabase) { setLoading(false); return }
 
+    // Filet de sécurité : si getSession ne répond pas, on débloque quand même
+    const safety = setTimeout(() => setLoading(false), 6000)
+
     supabase.auth.getSession()
       .then(({ data: { session } }) => {
         setUser(session?.user ?? null)
         return loadProfile(session?.user?.id)
       })
       .catch(() => {})
-      .finally(() => setLoading(false))
+      .finally(() => { clearTimeout(safety); setLoading(false) })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'PASSWORD_RECOVERY') {
@@ -41,7 +44,7 @@ export function AuthProvider({ children }) {
       }
     })
 
-    return () => subscription.unsubscribe()
+    return () => { clearTimeout(safety); subscription.unsubscribe() }
   }, [])
 
   async function signOut() {
