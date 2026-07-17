@@ -1105,7 +1105,7 @@ a  { text-decoration: none; color: inherit; }
     color: $text-muted;
     pointer-events: none;
   }
-  input { padding-left: 2.25rem; }
+  input, .form-input { padding-left: 2.25rem; width: 100%; }
 }
 
 .pending-invite-row {

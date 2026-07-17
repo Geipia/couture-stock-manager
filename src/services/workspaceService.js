@@ -50,13 +50,22 @@ export async function deleteWorkspace(id) {
 }
 
 export async function fetchWorkspaceMembers(workspaceId) {
-  const { data, error } = await supabase
+  const { data: members, error } = await supabase
     .from('workspace_members')
-    .select('*, profiles(email, display_name)')
+    .select('*')
     .eq('workspace_id', workspaceId)
     .order('joined_at')
   if (error) throw error
-  return data ?? []
+  if (!members?.length) return []
+
+  const userIds = members.map(m => m.user_id)
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('id, email, display_name')
+    .in('id', userIds)
+
+  const byId = Object.fromEntries((profiles ?? []).map(p => [p.id, p]))
+  return members.map(m => ({ ...m, profiles: byId[m.user_id] ?? null }))
 }
 
 export async function removeMember(workspaceId, userId) {

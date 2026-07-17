@@ -134,6 +134,7 @@ export default function Settings() {
           <form onSubmit={handleSaveName} className="settings-form-row">
             <input
               type="text"
+              className="form-input"
               value={editName}
               onChange={e => setEditName(e.target.value)}
               placeholder="Nom de l'espace"
@@ -199,6 +200,7 @@ export default function Settings() {
               <Mail size={16} className="input-icon" />
               <input
                 type="email"
+                className="form-input"
                 value={inviteEmail}
                 onChange={e => setInviteEmail(e.target.value)}
                 placeholder="email@exemple.com"
