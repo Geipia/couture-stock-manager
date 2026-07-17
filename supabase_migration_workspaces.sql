@@ -166,11 +166,15 @@ CREATE POLICY "invitations_update" ON workspace_invitations FOR UPDATE
     invited_email = (SELECT email FROM profiles WHERE id = auth.uid())
   );
 
--- Articles : mise à jour des policies pour inclure workspace
-DROP POLICY IF EXISTS "Users see own articles" ON articles;
+-- Articles : suppression de TOUTES les policies existantes avant recréation
+DROP POLICY IF EXISTS "Users see own articles"    ON articles;
 DROP POLICY IF EXISTS "Users insert own articles" ON articles;
 DROP POLICY IF EXISTS "Users update own articles" ON articles;
 DROP POLICY IF EXISTS "Users delete own articles" ON articles;
+DROP POLICY IF EXISTS "articles_select"           ON articles;
+DROP POLICY IF EXISTS "articles_insert"           ON articles;
+DROP POLICY IF EXISTS "articles_update"           ON articles;
+DROP POLICY IF EXISTS "articles_delete"           ON articles;
 CREATE POLICY "articles_select" ON articles FOR SELECT
   USING (is_admin() OR is_workspace_member(workspace_id));
 CREATE POLICY "articles_insert" ON articles FOR INSERT
@@ -180,11 +184,15 @@ CREATE POLICY "articles_update" ON articles FOR UPDATE
 CREATE POLICY "articles_delete" ON articles FOR DELETE
   USING (is_admin() OR is_workspace_member(workspace_id));
 
--- Projets
-DROP POLICY IF EXISTS "Users see own projets" ON projets;
+-- Projets : idem
+DROP POLICY IF EXISTS "Users see own projets"    ON projets;
 DROP POLICY IF EXISTS "Users insert own projets" ON projets;
 DROP POLICY IF EXISTS "Users update own projets" ON projets;
 DROP POLICY IF EXISTS "Users delete own projets" ON projets;
+DROP POLICY IF EXISTS "projets_select"           ON projets;
+DROP POLICY IF EXISTS "projets_insert"           ON projets;
+DROP POLICY IF EXISTS "projets_update"           ON projets;
+DROP POLICY IF EXISTS "projets_delete"           ON projets;
 CREATE POLICY "projets_select" ON projets FOR SELECT
   USING (is_admin() OR is_workspace_member(workspace_id));
 CREATE POLICY "projets_insert" ON projets FOR INSERT
