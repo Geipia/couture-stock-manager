@@ -87,10 +87,10 @@ export default function Navbar({ alertCount = 0 }) {
           )}
 
           {isAdmin && (
-            <div className="nav-link nav-link--admin">
+            <NavLink to="/admin/accounts" className={({ isActive }) => isActive ? 'nav-link nav-link--admin nav-link--active' : 'nav-link nav-link--admin'}>
               <ShieldCheck size={16} />
-              <span>Admin</span>
-            </div>
+              <span>Comptes</span>
+            </NavLink>
           )}
 
           <button className="navbar__logout" onClick={handleSignOut}>
@@ -126,6 +126,11 @@ export default function Navbar({ alertCount = 0 }) {
           <button className="mobile-link" onClick={handleChangeWorkspace}>
             <Store size={20} /><span>Changer d'espace</span>
           </button>
+          {isAdmin && (
+            <NavLink to="/admin/accounts" onClick={() => setOpen(false)} className="mobile-link">
+              <ShieldCheck size={20} /><span>Tous les comptes</span>
+            </NavLink>
+          )}
           <button className="mobile-link" onClick={handleSignOut}>
             <LogOut size={20} /><span>Déconnexion</span>
           </button>

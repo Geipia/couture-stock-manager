@@ -17,6 +17,7 @@ import Stats from './pages/Stats'
 import Login from './pages/Login'
 import WorkspaceSelector from './pages/WorkspaceSelector'
 import Settings from './pages/Settings'
+import AdminAccounts from './pages/AdminAccounts'
 
 function WorkspaceGuard({ children }) {
   const { workspace } = useWorkspace()
@@ -63,6 +64,7 @@ function AppLayout() {
         <Routes>
           <Route path="/login"      element={<Login />} />
           <Route path="/workspaces" element={<ProtectedRoute><WorkspaceSelector /></ProtectedRoute>} />
+          <Route path="/admin/accounts" element={<ProtectedRoute><AdminAccounts /></ProtectedRoute>} />
           <Route path="/"           element={<ProtectedRoute><WorkspaceGuard><Home /></WorkspaceGuard></ProtectedRoute>} />
           <Route path="/stock"      element={<ProtectedRoute><WorkspaceGuard><Stock /></WorkspaceGuard></ProtectedRoute>} />
           <Route path="/projets"    element={<ProtectedRoute><WorkspaceGuard><Projets /></WorkspaceGuard></ProtectedRoute>} />

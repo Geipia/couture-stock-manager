@@ -96,6 +96,11 @@ export default function WorkspaceSelector() {
             {isAdmin && (
               <span className="badge badge--admin"><ShieldCheck size={12} /> Admin</span>
             )}
+            {isAdmin && (
+              <button className="btn btn--secondary btn--sm" onClick={() => navigate('/admin/accounts')}>
+                <ShieldCheck size={14} /> Tous les comptes
+              </button>
+            )}
             <button className="btn btn--ghost btn--sm" onClick={async () => { await signOut(); navigate('/login') }}>Déconnexion</button>
           </div>
         </div>
